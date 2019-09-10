@@ -14,11 +14,7 @@ module.exports = {
     return res.json(user);
   },
   store: async (req,res) => {
-    console.log('body',req.body);
-    console.log('file',req.file);
-
     const user = await User.create(req.body);
-    console.log('user',user);
 
     if(req.file) {
       const fileName = `${user._id}.jpg`;
