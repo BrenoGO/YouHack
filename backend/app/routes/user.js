@@ -10,6 +10,4 @@ module.exports = function(app) {
   app.get('/user/:id', userController.findById);
   app.post('/user', upload.single('avatar'), userController.store);
   app.delete('/user/:id', userController.delete);
-
-  return app;
 }
