@@ -7,6 +7,7 @@ const upload = multer(uploadConfig);
 
 module.exports = function(app) {
   app.get('/user/faker', userController.createFake);
+  app.get('/user/teammate', userController.findTeammate);
 
   app.get('/user', userController.index);
   app.get('/user/:id', userController.findById);
