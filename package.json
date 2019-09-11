@@ -1,0 +1,6 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./backend/server.js"
+  }
+}
