@@ -9,7 +9,7 @@ app.set('port', process.env.PORT || 3333);
 
 app.use(cors());
 
-app.use('/files', express.static(path.resolve(__dirname, 'assets', 'avatars')));
+app.use('/avatars', express.static(path.resolve(__dirname, '..', 'assets', 'avatars')));
 
 router(app);
 
