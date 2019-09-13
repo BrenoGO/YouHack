@@ -1,37 +1,43 @@
-const {Schema, model} = require('mongoose');
+const { Schema, model } = require('mongoose');
+
+const { ObjectId } = Schema.Types;
 
 const schema = Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
     index: {
-      unique: true
-    }
+      unique: true,
+    },
   },
   description: String,
   frontend: {
     type: Number,
-    required: true
+    required: true,
   },
   backend: {
     type: Number,
-    required: true
+    required: true,
   },
   business: {
     type: Number,
-    required: true
+    required: true,
   },
   mobile: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
+  team: {
+    type: ObjectId,
+    ref: 'Team',
+  },
 },
 {
-  timestamps: true
+  timestamps: true,
 });
 
 module.exports = model('User', schema);

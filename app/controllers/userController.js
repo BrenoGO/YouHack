@@ -1,9 +1,11 @@
-const User = require('../models/userModel');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const faker = require('Faker');
+
+const User = require('../models/userModel');
+// const Team = require('../models/teamModel');
 
 
 const imgSize = [400, 400];
@@ -13,7 +15,7 @@ async function downloadAvatar(id) {
   const imgPath = path.resolve(__dirname, '..', '..', 'assets', 'avatars', `${id}.jpg`);
 
   const response = await axios.get(url, { responseType: 'arraybuffer' });
-  
+
   await sharp(response.data)
     .resize(...imgSize)
     .jpeg()
@@ -30,12 +32,12 @@ module.exports = {
     const user = await User.findById(id);
     return res.json(user);
   },
-  store: async (req,res) => {
+  store: async (req, res) => {
     const user = await User.create(req.body);
 
-    if(req.file) {
+    if (req.file) {
       const fileName = `${user._id}.jpg`;
-  
+
       await sharp(req.file.path)
         .resize(...imgSize)
         .jpeg()
@@ -45,93 +47,101 @@ module.exports = {
       fs.unlinkSync(req.file.path);
     }
     return res.json(user);
-
   },
   delete: async (req, res) => {
     const { id } = req.params;
     await User.findByIdAndDelete(id);
     const imgPath = path.resolve(__dirname, '..', '..', 'assets', 'avatars', `${id}.jpg`);
-    if(fs.existsSync(imgPath)) {
+    if (fs.existsSync(imgPath)) {
       fs.unlinkSync(imgPath);
     }
-    
-    return res.json({ok:'removed'});
+
+    return res.json({ ok: 'removed' });
   },
   createFake: async (req, res) => {
     const user = await User.create({
       name: faker.Name.findName(),
       email: faker.Internet.email(),
       description: faker.Lorem.paragraph(),
-      frontend: Math.floor(Math.random()*5),
-      backend: Math.floor(Math.random()*5),
-      business: Math.floor(Math.random()*5),
-      mobile: Math.floor(Math.random()*5)
-    })
+      frontend: Math.floor(Math.random() * 5),
+      backend: Math.floor(Math.random() * 5),
+      business: Math.floor(Math.random() * 5),
+      mobile: Math.floor(Math.random() * 5),
+    });
     downloadAvatar(user._id);
 
-    res.json(user);
+    return res.json(user);
+  },
+  updateTeam: async (req, res) => {
+    const { userId } = req.body;
+    let { teamId } = req.body;
+    if (teamId === 0) {
+      teamId = '000000000000000000000000';
+    }
+    await User.findByIdAndUpdate(userId, { team: teamId });
+    return res.json({ ok: 'ok' });
   },
   findTeammate: async (req, res) => {
-    // scores are now from 0 to 4. 
-    //still have to add conditions about:
-    // nin user team
-    // doesn't have any team
-    const { user: userId } = req.headers;
+    // scores are now from 0 to 4.
+    // still have to add conditions about: doesn't have any team
+
+    const { userId } = req.headers;
     const user = await User.findById(userId);
-    
-    //  exclude the user himself
-    const conditions = [{ _id: { $ne: userId } }];
+
+    //  exclude the user himself & doesn't have a team
+    const conditions = [{ _id: { $ne: userId } }, { team: { $exists: false } }];
 
     // set frontend skill rules
     const frontend = {};
-    if(user.frontend < 2){
+    if (user.frontend < 2) {
       frontend.$gte = 2;
-      conditions.push({frontend});
+      conditions.push({ frontend });
     } else if (user.frontend >= 3) {
       frontend.$lte = 2;
-      conditions.push({frontend});
+      conditions.push({ frontend });
     }
 
     // set backend skill rules
     const backend = {};
-    if(user.backend < 2){
+    if (user.backend < 2) {
       backend.$gte = 2;
-      conditions.push({backend});
+      conditions.push({ backend });
     } else if (user.backend >= 3) {
       backend.$lte = 2;
-      conditions.push({backend});
+      conditions.push({ backend });
     }
-    
+
     // set business skill rules
     const business = {};
-    if(user.business < 2){
+    if (user.business < 2) {
       business.$gte = 2;
-      conditions.push({business});
+      conditions.push({ business });
     } else if (user.business >= 3) {
       business.$lte = 2;
-      conditions.push({business});
+      conditions.push({ business });
     }
 
     // set mobile skill rules
     const mobile = {};
-    if(user.mobile < 2){
+    if (user.mobile < 2) {
       mobile.$gte = 2;
-      conditions.push({mobile});
+      conditions.push({ mobile });
     } else if (user.mobile >= 3) {
       mobile.$lte = 2;
-      conditions.push({mobile});
+      conditions.push({ mobile });
     }
-    
+
     let users = await User.find({
-      $and: conditions
+      $and: conditions,
     });
-    if(users.length === 0){
-      const conditions = [{ _id: { $ne: userId } }];
+
+    if (users.length === 0) {
+      const newConditions = [{ _id: { $ne: userId } }, { team: { $exists: false } }];
       users = await User.find({
-        $and: conditions
-      }); 
+        $and: newConditions
+      });
     }
-    
-    res.json(users);
-  }
-}
+
+    return res.json(users);
+  },
+};

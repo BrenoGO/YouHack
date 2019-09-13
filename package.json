@@ -19,6 +19,9 @@
     "Faker": "^0.7.2"
   },
   "devDependencies": {
+    "eslint": "^6.3.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
     "nodemon": "^1.19.2"
   }
 }
