@@ -75,7 +75,7 @@ module.exports = {
     return res.json(user);
   },
   updateTeam: async (req, res) => {
-    const { userId } = req.body;
+    const { user: userId } = req.body;
     let { teamId } = req.body;
     if (teamId === 0) {
       teamId = '000000000000000000000000';
@@ -85,9 +85,7 @@ module.exports = {
   },
   findTeammate: async (req, res) => {
     // scores are now from 0 to 4.
-    // still have to add conditions about: doesn't have any team
-
-    const { userId } = req.headers;
+    const { user: userId } = req.headers;
     const user = await User.findById(userId);
 
     //  exclude the user himself & doesn't have a team
