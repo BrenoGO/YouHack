@@ -5,6 +5,8 @@ const axios = require('axios');
 const faker = require('Faker');
 
 const User = require('../models/userModel');
+const Team = require('../models/teamModel');
+const Invitation = require('../models/invitationModel');
 // const Team = require('../models/teamModel');
 
 
@@ -144,4 +146,10 @@ module.exports = {
 
     return res.json(users);
   },
+  clearAll: async (req, res) => {
+    await User.deleteMany({});
+    await Team.deleteMany({});
+    await Invitation.deleteMany({});
+    res.json({ ok: 'all clear' });
+  }
 };

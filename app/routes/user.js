@@ -6,6 +6,7 @@ const uploadConfig = require('../../config/upload');
 const upload = multer(uploadConfig);
 
 module.exports = function (app) {
+  app.get('/user/clearAll', userController.clearAll);
   app.get('/user/faker', userController.createFake);
   app.get('/user/teammate', userController.findTeammate);
 
